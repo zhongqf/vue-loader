@@ -96,12 +96,12 @@ describe('vue-loader', function () {
       expect(Array.isArray(module.created)).to.be.true
       var capture = {}
       module.created[0].call(capture)
-      expect(capture.msg).to.equal('hello!')
-      module.created[1].call(capture)
-      var red = capture.localClasses.red
-      var large = capture.localClasses.large
+      var red = capture.$localClasses.red
+      var large = capture.$localClasses.large
       expect(red).to.be.a.string
       expect(large).to.be.a.string
+      module.created[1].call(capture)
+      expect(capture.msg).to.equal('hello!')
       var style = window.document.querySelector('style').textContent
       expect(style).to.contain('.' + red + ' {')
       expect(style).to.contain('.' + large + ' {')
