@@ -88,6 +88,28 @@ describe('vue-loader', function () {
     })
   })
 
+  it('local class', function (done) {
+    test({
+      entry: './test/fixtures/local-class.js'
+    }, function (window) {
+      var module = window.testModule
+      expect(Array.isArray(module.created)).to.be.true
+      var capture = {}
+      module.created[0].call(capture)
+      expect(capture.msg).to.equal('hello!')
+      module.created[1].call(capture)
+      var red = capture.localClasses.red
+      var large = capture.localClasses.large
+      expect(red).to.be.a.string
+      expect(large).to.be.a.string
+      var style = window.document.querySelector('style').textContent
+      expect(style).to.contain('.' + red + ' {')
+      expect(style).to.contain('.' + large + ' {')
+      expect(module.template).to.contain('<div class="global ' + large + ' ' + red + '">')
+      done()
+    })
+  })
+
   it('source-map', function (done) {
     var config = assign({}, globalConfig, {
       entry: './test/fixtures/basic.js',
@@ -116,5 +138,4 @@ describe('vue-loader', function () {
       })
     })
   })
-
 })
