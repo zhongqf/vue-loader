@@ -92,22 +92,69 @@ describe('vue-loader', function () {
     test({
       entry: './test/fixtures/local-class.js'
     }, function (window) {
+      // should inject v-local-class directive
+      expect(window.Vue.directive('local-class')).to.exist
       var module = window.testModule
       expect(Array.isArray(module.created)).to.be.true
       var capture = {}
+      // should inject vm.$localClasses
       module.created[0].call(capture)
       var red = capture.$localClasses.red
       var large = capture.$localClasses.large
       expect(red).to.be.a.string
       expect(large).to.be.a.string
+      // should keep original created hook
       module.created[1].call(capture)
       expect(capture.msg).to.equal('hello!')
+      // should transform CSS classes correctly
       var style = window.document.querySelector('style').textContent
       expect(style).to.contain('.' + red + ' {')
       expect(style).to.contain('.' + large + ' {')
+      // should transform HTML classes correctly
       expect(module.template).to.contain('<div class="global ' + large + ' ' + red + '">')
       done()
     })
+  })
+
+  it('local-class directive', function () {
+    require('../lib/local-class')
+    var Vue = require('vue')
+    // mock vm
+    var vm = {
+      $localClasses: {
+        red: 'FfesGgHrzvbji'
+      }
+    }
+    // with arg
+    var dir = Vue.util.extend({
+      vm: vm,
+      arg: 'red',
+      el: mockDiv()
+    }, Vue.directive('local-class'))
+    dir.bind()
+    expect(dir.arg).to.equal(vm.$localClasses.red)
+    dir.update(true)
+    expect(dir.el.classList.contains(vm.$localClasses.red)).to.be.true
+    dir.update(false)
+    expect(dir.el.classList.contains(vm.$localClasses.red)).to.be.false
+    // no arg
+    dir = Vue.util.extend({
+      vm: vm,
+      el: mockDiv()
+    }, Vue.directive('local-class'))
+    dir.bind()
+    expect(dir.locals).to.equal(vm.$localClasses)
+    // string
+    dir.update('red')
+    expect(dir.el.classList.list.join(' ')).to.contain(vm.$localClasses.red)
+    dir.update({
+      red: false
+    })
+    expect(dir.el.classList.list.join(' ')).not.to.contain(vm.$localClasses.red)
+    dir.update({
+      red: true
+    })
+    expect(dir.el.classList.list.join(' ')).to.contain(vm.$localClasses.red)
   })
 
   it('source-map', function (done) {
@@ -139,3 +186,22 @@ describe('vue-loader', function () {
     })
   })
 })
+
+function mockDiv () {
+  return {
+    classList: {
+      list: [],
+      add: function (cls) {
+        if (!this.contains(cls)) {
+          this.list.push(cls)
+        }
+      },
+      remove: function (cls) {
+        this.list.$remove(cls)
+      },
+      contains: function (cls) {
+        return this.list.indexOf(cls) > -1
+      }
+    }
+  }
+}
