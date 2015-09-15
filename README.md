@@ -33,6 +33,7 @@ It allows you to write your components in this format:
 - [Basic Usage](#basic-usage)
 - [Pre-Processors](#pre-processors)
 - [Style Imports](#style-imports)
+- [Multi Components](#multi-components)
 - [Asset URL Handling](#asset-url-handling)
 - [Advanced Loader Configuration](#advanced-loader-configuration)
   - [ES6 with Babel Example](#example-using-es6-with-babel)
@@ -100,6 +101,49 @@ If you want, you can separate your styles into a separate file and import it usi
 ```
 
 Beware that `src` imports follow similar rules to `require()` calls, which means for relative paths you need to start with `./`, and you can import resources from node modules: `<style src="todomvc-app-css/index.css">`.
+
+## Multi Components
+
+You can define multi components in a single .vue file.
+
+``` html
+// app.vue
+<component name='first'>
+  <style>
+    .red {
+      color: #f00;
+    }
+  </style>
+
+  <template>
+    <h1 class="red">{{msg}}</h1>
+  </template>
+
+  <script>
+    module.exports = {
+      data: function () {
+        return {
+          msg: 'Hello world!'
+        }
+      }
+    }
+  </script>
+</component>
+
+<component name='second'>
+...
+</component>
+```
+
+And in your main entry file:
+
+``` js
+// main.js
+var Vue = require('vue')
+var appOptions = require('./app.vue')
+var appFirst  = new Vue(appOptions.first).$mount('#app-first')
+var appSecond = new Vue(appOptions.second).$mount('#app-second')
+```
 
 ## Asset URL Handling
 
