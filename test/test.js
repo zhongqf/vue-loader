@@ -72,6 +72,25 @@ describe('vue-loader', function () {
     })
   })
 
+  it('multi', function (done) {
+    test({
+      entry: './test/fixtures/multi.js'
+    }, function (window) {
+      var module = window.testModule
+
+      expect(module.first.template).to.contain('<h2 class="red">{{msg}}</h2>')
+      expect(module.first.data().msg).to.contain('Hello from Component First!')
+
+      expect(module.second.template).to.contain('<h2 class="blue">{{msg}}</h2>')
+      expect(module.second.data().msg).to.contain('Hello from Component Second!')
+
+      var style = window.document.querySelector('style').textContent
+      expect(style).to.contain('comp-first h2 {\n  color: #f00;\n}')
+      expect(style).to.contain('comp-second h2 {\n  color: #00f;\n}')
+      done()
+    })
+  })
+
   it('pre-processors', function (done) {
     test({
       entry: './test/fixtures/pre.js'
