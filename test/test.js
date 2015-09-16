@@ -91,6 +91,16 @@ describe('vue-loader', function () {
     })
   })
 
+  it('multi components with requires', function (done) {
+    test({
+      entry: './test/fixtures/multi-with-requires.js'
+    }, function (window) {
+      var module = window.testModule
+
+      done()
+    })
+  })
+
   it('pre-processors', function (done) {
     test({
       entry: './test/fixtures/pre.js'

@@ -1,0 +1,1 @@
+window.testModule = require('./multi-with-requires.vue')
